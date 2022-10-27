@@ -526,38 +526,6 @@ struct UnicodeTextEditor::Iterator
             
             attributedString.draw(g, {atomX, lineY, atom->width, lineHeight});
         }
-        
-        /*
-        if (passwordCharacter != 0 || ! atom->isWhitespace())
-        {
-            GlyphArrangement ga;
-            ga.addLineOfText (currentSection->font,
-                              atom->getTrimmedText (passwordCharacter),
-                              atomX, (float) roundToInt (lineY + lineHeight - maxDescent));
-
-            if (selected.getEnd() < indexInText + atom->numChars)
-            {
-                GlyphArrangement ga2 (ga);
-                ga2.removeRangeOfGlyphs (0, selected.getEnd() - indexInText);
-                ga.removeRangeOfGlyphs (selected.getEnd() - indexInText, -1);
-
-                g.setColour (currentSection->colour);
-                ga2.draw (g, transform);
-            }
-
-            if (selected.getStart() > indexInText)
-            {
-                GlyphArrangement ga2 (ga);
-                ga2.removeRangeOfGlyphs (selected.getStart() - indexInText, -1);
-                ga.removeRangeOfGlyphs (0, selected.getStart() - indexInText);
-
-                g.setColour (currentSection->colour);
-                ga2.draw (g, transform);
-            }
-
-            g.setColour (selectedTextColour);
-            ga.draw (g, transform);
-        } */
     }
 
     //==============================================================================
