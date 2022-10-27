@@ -482,20 +482,26 @@ struct UnicodeTextEditor::Iterator
 
         if (passwordCharacter != 0 || (underlineWhitespace || ! atom->isWhitespace()))
         {
-            if (lastSection != currentSection)
-            {
-                lastSection = currentSection;
-                g.setColour (currentSection->colour);
-                g.setFont (currentSection->font);
-            }
-
             jassert (atom->getTrimmedText (passwordCharacter).isNotEmpty());
-
+            
+            AttributedString attributedString;
+            attributedString.append(atom->getTrimmedText(passwordCharacter));
+            
+            attributedString.setColour(currentSection->colour);
+            attributedString.setFont(currentSection->font);
+            
+            TextLayout textLayout;
+            textLayout.createLayout(attributedString, atom->width);
+            
+            textLayout.draw(g, {atomX, lineY, atom->width, lineHeight});
+            
+            /*
+            
             GlyphArrangement ga;
             ga.addLineOfText (currentSection->font,
                               atom->getTrimmedText (passwordCharacter),
                               atomX, (float) roundToInt (lineY + lineHeight - maxDescent));
-            ga.draw (g, transform);
+            ga.draw (g, transform); */
         }
     }
 
@@ -516,6 +522,23 @@ struct UnicodeTextEditor::Iterator
         if (atom == nullptr)
             return;
 
+        if (passwordCharacter != 0 || ! atom->isWhitespace())
+        {
+            AttributedString attributedString;
+            attributedString.append(atom->getTrimmedText(passwordCharacter));
+            attributedString.setFont(currentSection->font);
+            attributedString.setColour(currentSection->colour);
+            
+            if(!selected.isEmpty()) {
+                attributedString.setColour(selected, selectedTextColour);
+            }
+            
+            TextLayout textLayout;
+            textLayout.createLayout(attributedString, atom->width);
+            textLayout.draw(g, {atomX, lineY, atom->width, lineHeight});
+        }
+        
+        /*
         if (passwordCharacter != 0 || ! atom->isWhitespace())
         {
             GlyphArrangement ga;
@@ -545,7 +568,7 @@ struct UnicodeTextEditor::Iterator
 
             g.setColour (selectedTextColour);
             ga.draw (g, transform);
-        }
+        } */
     }
 
     //==============================================================================
@@ -1784,8 +1807,7 @@ void UnicodeTextEditor::drawContent (Graphics& g)
 
 void UnicodeTextEditor::paint (Graphics& g)
 {
-    // TODO: fix this
-    //getLookAndFeel().fillTextEditorBackground (g, getWidth(), getHeight(), *this);
+    fillTextEditorBackground (g, getWidth(), getHeight());
 }
 
 void UnicodeTextEditor::paintOverChildren (Graphics& g)
@@ -1805,9 +1827,8 @@ void UnicodeTextEditor::paintOverChildren (Graphics& g)
         if (! textBounds.isEmpty())
             g.drawText (textToShowWhenEmpty, textBounds, justification, true);
     }
-
-    // TODO: fix this!
-    //getLookAndFeel().drawTextEditorOutline (g, getWidth(), getHeight(), *this);
+    
+    drawTextEditorOutline (g, getWidth(), getHeight());
 }
 
 //==============================================================================
@@ -2788,4 +2809,36 @@ private:
 std::unique_ptr<AccessibilityHandler> UnicodeTextEditor::createAccessibilityHandler()
 {
     return std::make_unique<EditorAccessibilityHandler> (*this);
+}
+
+// LookAndFeel-ish functions: you can override these for custom drawing behaviour
+void UnicodeTextEditor::fillTextEditorBackground (Graphics& g, int width, int height)
+{
+    g.setColour (findColour (TextEditor::backgroundColourId));
+    g.fillRect (0, 0, width, height);
+
+    g.setColour (findColour (TextEditor::outlineColourId));
+    g.drawHorizontalLine (height - 1, 0.0f, static_cast<float> (width));
+}
+
+void UnicodeTextEditor::drawTextEditorOutline (Graphics& g, int width, int height)
+{
+    if (isEnabled())
+    {
+        if (hasKeyboardFocus (true) && ! isReadOnly())
+        {
+            g.setColour (findColour (TextEditor::focusedOutlineColourId));
+            g.drawRect (0, 0, width, height, 2);
+        }
+        else
+        {
+            g.setColour (findColour (TextEditor::outlineColourId));
+            g.drawRect (0, 0, width, height);
+        }
+    }
+}
+
+CaretComponent* UnicodeTextEditor::createCaretComponent (Component* keyFocusOwner)
+{
+    return new CaretComponent (keyFocusOwner);
 }

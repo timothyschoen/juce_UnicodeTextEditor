@@ -690,19 +690,10 @@ public:
     */
     bool getClicksOutsideDismissVirtualKeyboard() const     { return clicksOutsideDismissVirtualKeyboard; }
 
-    //==============================================================================
-    /** This abstract base class is implemented by LookAndFeel classes to provide
-        UnicodeTextEditor drawing functionality.
-    */
-    struct LookAndFeelMethods
-    {
-        virtual ~LookAndFeelMethods() = default;
-
-        virtual void fillTextEditorBackground (Graphics&, int width, int height, UnicodeTextEditor&) = 0;
-        virtual void drawTextEditorOutline (Graphics&, int width, int height, UnicodeTextEditor&) = 0;
-
-        virtual CaretComponent* createCaretComponent (Component* keyFocusOwner) = 0;
-    };
+    // LookAndFeel-ish functions: you can override these for custom drawing behaviour
+    virtual void fillTextEditorBackground (Graphics&, int width, int height);
+    virtual void drawTextEditorOutline (Graphics&, int width, int height);
+    virtual CaretComponent* createCaretComponent (Component* keyFocusOwner);
 
     //==============================================================================
     /** @internal */
