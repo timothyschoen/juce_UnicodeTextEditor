@@ -5,6 +5,8 @@ MainComponent::MainComponent()
 {
     setSize (600, 400);
     addAndMakeVisible(editor);
+    editor.setMultiLine(true);
+    editor.setReturnKeyStartsNewLine(true);
 }
 
 MainComponent::~MainComponent()
