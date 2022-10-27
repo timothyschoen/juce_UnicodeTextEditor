@@ -677,6 +677,16 @@ public:
     */
     void setKeyboardType (VirtualKeyboardType type) noexcept    { keyboardType = type; }
 
+    
+    struct JUCE_API  LookAndFeelMethods
+    {
+        virtual ~LookAndFeelMethods() {}
+
+        virtual void fillUnicodeTextEditorBackground (Graphics&, int width, int height, UnicodeTextEditor&) = 0;
+        virtual void drawUnicodeTextEditorOutline (Graphics&, int width, int height, UnicodeTextEditor&) = 0;
+
+        virtual CaretComponent* createSingleLineCaretComponent (Component* keyFocusOwner) = 0;
+    };
     /** Sets the behaviour of mouse/touch interactions outside this component.
 
         If true, then presses outside of the UnicodeTextEditor will dismiss the virtual keyboard.

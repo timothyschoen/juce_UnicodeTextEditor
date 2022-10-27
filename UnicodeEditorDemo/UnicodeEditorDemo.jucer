@@ -23,8 +23,8 @@
         <MODULEPATH id="juce_events" path="../../../JUCE/modules"/>
         <MODULEPATH id="juce_graphics" path="../../../JUCE/modules"/>
         <MODULEPATH id="juce_gui_basics" path="../../../JUCE/modules"/>
-        <MODULEPATH id="UnicodeTextEditor" path="../UnicodeTextEditor"/>
         <MODULEPATH id="juce_gui_extra" path="../../JUCE/modules"/>
+        <MODULEPATH id="UnicodeTextEditor" path="../../juce_UnicodeTextEditor"/>
       </MODULEPATHS>
     </XCODE_MAC>
   </EXPORTFORMATS>

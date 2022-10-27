@@ -487,21 +487,10 @@ struct UnicodeTextEditor::Iterator
             AttributedString attributedString;
             attributedString.append(atom->getTrimmedText(passwordCharacter));
             
+            attributedString.setJustification(justification);
             attributedString.setColour(currentSection->colour);
             attributedString.setFont(currentSection->font);
-            
-            TextLayout textLayout;
-            textLayout.createLayout(attributedString, atom->width);
-            
-            textLayout.draw(g, {atomX, lineY, atom->width, lineHeight});
-            
-            /*
-            
-            GlyphArrangement ga;
-            ga.addLineOfText (currentSection->font,
-                              atom->getTrimmedText (passwordCharacter),
-                              atomX, (float) roundToInt (lineY + lineHeight - maxDescent));
-            ga.draw (g, transform); */
+            attributedString.draw(g, {atomX, lineY, atom->width, lineHeight});
         }
     }
 
@@ -525,6 +514,8 @@ struct UnicodeTextEditor::Iterator
         if (passwordCharacter != 0 || ! atom->isWhitespace())
         {
             AttributedString attributedString;
+            
+            attributedString.setJustification(justification);
             attributedString.append(atom->getTrimmedText(passwordCharacter));
             attributedString.setFont(currentSection->font);
             attributedString.setColour(currentSection->colour);
@@ -533,9 +524,7 @@ struct UnicodeTextEditor::Iterator
                 attributedString.setColour(selected, selectedTextColour);
             }
             
-            TextLayout textLayout;
-            textLayout.createLayout(attributedString, atom->width);
-            textLayout.draw(g, {atomX, lineY, atom->width, lineHeight});
+            attributedString.draw(g, {atomX, lineY, atom->width, lineHeight});
         }
         
         /*
@@ -1134,7 +1123,7 @@ void UnicodeTextEditor::applyColourToAllText (const Colour& newColour, bool chan
         uts->colour = newColour;
 
     if (changeCurrentTextColour)
-        setColour (UnicodeTextEditor::textColourId, newColour);
+        setColour (TextEditor::textColourId, newColour);
     else
         repaint();
 }
