@@ -28,7 +28,7 @@
      using the latest version of the Projucer or, if you aren't using the Projucer to manage your project,
      remove the JUCE_PROJUCER_VERSION define.
  */
-
+ #error "This project was last saved using an outdated version of the Projucer! Re-save this project with the latest version to fix this error."
 #endif
 
 
