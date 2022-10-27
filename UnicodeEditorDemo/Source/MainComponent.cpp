@@ -4,9 +4,34 @@
 MainComponent::MainComponent()
 {
     setSize (600, 400);
-    addAndMakeVisible(editor);
-    editor.setMultiLine(true);
-    editor.setReturnKeyStartsNewLine(true);
+    addAndMakeVisible(unicodeEditor);
+    unicodeEditor.setMultiLine(true);
+    unicodeEditor.setReturnKeyStartsNewLine(true);
+    
+    normalEditor.setMultiLine(true);
+    normalEditor.setReturnKeyStartsNewLine(true);
+    addChildComponent(normalEditor);
+    
+    toggleEditorButton.setButtonText("Disable Unicode");
+    toggleEditorButton.setToggleState(true, dontSendNotification);
+    addAndMakeVisible(&toggleEditorButton);
+    toggleEditorButton.setConnectedEdges(12);
+    toggleEditorButton.setClickingTogglesState(true);
+    
+    toggleEditorButton.onClick = [this](){
+        auto state = toggleEditorButton.getToggleState();
+        normalEditor.setVisible(!state);
+        unicodeEditor.setVisible(state);
+        
+        toggleEditorButton.setButtonText(state ? "Disable Unicode" : "Enable Unicode");
+        
+        if(state) {
+            unicodeEditor.setText(normalEditor.getText());
+        }
+        else {
+            normalEditor.setText(unicodeEditor.getText());
+        }
+    };
 }
 
 MainComponent::~MainComponent()
@@ -22,5 +47,8 @@ void MainComponent::paint (juce::Graphics& g)
 
 void MainComponent::resized()
 {
-    editor.setBounds(getLocalBounds());
+    unicodeEditor.setBounds(getLocalBounds());
+    normalEditor.setBounds(getLocalBounds());
+    
+    toggleEditorButton.setBounds(0, getHeight() - 30, 100, 30);
 }
