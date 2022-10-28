@@ -13,7 +13,7 @@ MainComponent::MainComponent()
     addChildComponent(normalEditor);
     
     toggleEditorButton.setButtonText("Disable Unicode");
-    toggleEditorButton.setToggleState(true, dontSendNotification);
+    toggleEditorButton.setToggleState(true, juce::dontSendNotification);
     addAndMakeVisible(&toggleEditorButton);
     toggleEditorButton.setConnectedEdges(12);
     toggleEditorButton.setClickingTogglesState(true);
