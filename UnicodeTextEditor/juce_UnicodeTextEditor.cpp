@@ -2692,62 +2692,62 @@ public:
                                 textEditorToWrap.isReadOnly() ? AccessibilityRole::staticText : AccessibilityRole::editableText,
                                 {},
                                 { std::make_unique<TextEditorTextInterface> (textEditorToWrap) }),
-          UnicodeTextEditor (textEditorToWrap)
+          unicodeTextEditor (textEditorToWrap)
     {
     }
 
-    String getHelp() const override  { return UnicodeTextEditor.getTooltip(); }
+    String getHelp() const override  { return unicodeTextEditor.getTooltip(); }
 
 private:
     class TextEditorTextInterface  : public AccessibilityTextInterface
     {
     public:
         explicit TextEditorTextInterface (UnicodeTextEditor& editor)
-            : UnicodeTextEditor (editor)
+            : unicodeTextEditor (editor)
         {
         }
 
-        bool isDisplayingProtectedText() const override      { return UnicodeTextEditor.getPasswordCharacter() != 0; }
-        bool isReadOnly() const override                     { return UnicodeTextEditor.isReadOnly(); }
+        bool isDisplayingProtectedText() const override      { return unicodeTextEditor.getPasswordCharacter() != 0; }
+        bool isReadOnly() const override                     { return unicodeTextEditor.isReadOnly(); }
 
-        int getTotalNumCharacters() const override           { return UnicodeTextEditor.getText().length(); }
-        Range<int> getSelection() const override             { return UnicodeTextEditor.getHighlightedRegion(); }
+        int getTotalNumCharacters() const override           { return unicodeTextEditor.getText().length(); }
+        Range<int> getSelection() const override             { return unicodeTextEditor.getHighlightedRegion(); }
 
         void setSelection (Range<int> r) override
         {
-            UnicodeTextEditor.setHighlightedRegion (r);
+            unicodeTextEditor.setHighlightedRegion (r);
         }
 
         String getText (Range<int> r) const override
         {
             if (isDisplayingProtectedText())
-                return String::repeatedString (String::charToString (UnicodeTextEditor.getPasswordCharacter()),
+                return String::repeatedString (String::charToString (unicodeTextEditor.getPasswordCharacter()),
                                                getTotalNumCharacters());
 
-            return UnicodeTextEditor.getTextInRange (r);
+            return unicodeTextEditor.getTextInRange (r);
         }
 
         void setText (const String& newText) override
         {
-            UnicodeTextEditor.setText (newText);
+            unicodeTextEditor.setText (newText);
         }
 
-        int getTextInsertionOffset() const override          { return UnicodeTextEditor.getCaretPosition(); }
+        int getTextInsertionOffset() const override          { return unicodeTextEditor.getCaretPosition(); }
 
         RectangleList<int> getTextBounds (Range<int> textRange) const override
         {
-            auto localRects = UnicodeTextEditor.getTextBounds (textRange);
+            auto localRects = unicodeTextEditor.getTextBounds (textRange);
             RectangleList<int> globalRects;
 
             std::for_each (localRects.begin(), localRects.end(),
-                           [&] (const Rectangle<int>& r) { globalRects.add (UnicodeTextEditor.localAreaToGlobal (r)); });
+                           [&] (const Rectangle<int>& r) { globalRects.add ( unicodeTextEditor.localAreaToGlobal (r)); });
 
             return globalRects;
         }
 
         int getOffsetAtPoint (Point<int> point) const override
         {
-            return UnicodeTextEditor.getTextIndexAt (UnicodeTextEditor.getLocalPoint (nullptr, point));
+            return unicodeTextEditor.getTextIndexAt (unicodeTextEditor.getLocalPoint (nullptr, point));
         }
 
     private:
