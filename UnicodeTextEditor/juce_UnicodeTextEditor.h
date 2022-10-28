@@ -768,7 +768,7 @@ private:
     struct TextEditorViewport;
     struct InsertAction;
     struct RemoveAction;
-    class UnicodeTextEditorAccessibilityHandler;
+    class EditorAccessibilityHandler;
 
     std::unique_ptr<Viewport> viewport;
     TextHolderComponent* textHolder;
