@@ -2684,10 +2684,10 @@ void UnicodeTextEditor::coalesceSimilarSections()
 }
 
 //==============================================================================
-class UnicodeTextEditor::EditorAccessibilityHandler  : public AccessibilityHandler
+class UnicodeTextEditorAccessibilityHandler  : public AccessibilityHandler
 {
 public:
-    explicit EditorAccessibilityHandler (UnicodeTextEditor& textEditorToWrap)
+    explicit UnicodeTextEditorAccessibilityHandler (UnicodeTextEditor& textEditorToWrap)
         : AccessibilityHandler (textEditorToWrap,
                                 textEditorToWrap.isReadOnly() ? AccessibilityRole::staticText : AccessibilityRole::editableText,
                                 {},
@@ -2760,12 +2760,12 @@ private:
     UnicodeTextEditor& UnicodeTextEditor;
 
     //==============================================================================
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EditorAccessibilityHandler)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (UnicodeTextEditorAccessibilityHandler)
 };
 
 std::unique_ptr<AccessibilityHandler> UnicodeTextEditor::createAccessibilityHandler()
 {
-    return std::make_unique<EditorAccessibilityHandler> (*this);
+    return std::make_unique<UnicodeTextEditorAccessibilityHandler> (*this);
 }
 
 // LookAndFeel-ish functions: you can override these for custom drawing behaviour
