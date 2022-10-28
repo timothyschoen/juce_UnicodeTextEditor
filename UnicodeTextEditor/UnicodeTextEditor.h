@@ -17,13 +17,13 @@
 
   ID:               UnicodeTextEditor
   vendor:           TimothySchoen
-  version:          1.0.0
+  version:          0.9.0
   name:             UnicodeTextEditor
   description:      Unicode Text Editor
-  website:          www.google.com
+  website:          https://github.com/timothyschoen
   license:          GPLv3
 
-  dependencies:     juce_core juce_graphics juce_events juce_gui_basics juce_gui_extra
+  dependencies:     juce_graphics juce_data_structures
 
  END_JUCE_MODULE_DECLARATION
 
