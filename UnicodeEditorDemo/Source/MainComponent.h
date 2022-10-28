@@ -23,9 +23,9 @@ private:
     // Your private member variables go here...
 
     UnicodeTextEditor unicodeEditor;
-    TextEditor normalEditor;
     
-    TextButton toggleEditorButton;
+    juce::TextEditor normalEditor;
+    juce::TextButton toggleEditorButton;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
 };

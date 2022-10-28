@@ -29,24 +29,24 @@
 struct TextAtom
 {
     //==============================================================================
-    String atomText;
+    juce::String atomText;
     float width;
     int numChars;
 
     //==============================================================================
-    bool isWhitespace() const noexcept       { return CharacterFunctions::isWhitespace (atomText[0]); }
+    bool isWhitespace() const noexcept       { return juce::CharacterFunctions::isWhitespace (atomText[0]); }
     bool isNewLine() const noexcept          { return atomText[0] == '\r' || atomText[0] == '\n'; }
 
-    String getText (juce_wchar passwordCharacter) const
+    juce::String getText (juce::juce_wchar passwordCharacter) const
     {
         if (passwordCharacter == 0)
             return atomText;
 
-        return String::repeatedString (String::charToString (passwordCharacter),
+        return juce::String::repeatedString (juce::String::charToString (passwordCharacter),
                                        atomText.length());
     }
 
-    String getTrimmedText (const juce_wchar passwordCharacter) const
+    juce::String getTrimmedText (const juce::juce_wchar passwordCharacter) const
     {
         if (passwordCharacter == 0)
             return atomText.substring (0, numChars);
@@ -54,7 +54,7 @@ struct TextAtom
         if (isNewLine())
             return {};
 
-        return String::repeatedString (String::charToString (passwordCharacter), numChars);
+        return juce::String::repeatedString (juce::String::charToString (passwordCharacter), numChars);
     }
 
     JUCE_LEAK_DETECTOR (TextAtom)
@@ -65,7 +65,7 @@ struct TextAtom
 class UnicodeTextEditor::UniformTextSection
 {
 public:
-    UniformTextSection (const String& text, const Font& f, Colour col, juce_wchar passwordCharToUse)
+    UniformTextSection (const juce::String& text, const juce::Font& f, juce::Colour col, juce::juce_wchar passwordCharToUse)
         : font (f), colour (col), passwordChar (passwordCharToUse)
     {
         initialiseAtoms (text);
@@ -86,14 +86,14 @@ public:
             {
                 auto& lastAtom = atoms.getReference (atoms.size() - 1);
 
-                if (! CharacterFunctions::isWhitespace (lastAtom.atomText.getLastCharacter()))
+                if (! juce::CharacterFunctions::isWhitespace (lastAtom.atomText.getLastCharacter()))
                 {
                     auto& first = other.atoms.getReference(0);
 
-                    if (! CharacterFunctions::isWhitespace (first.atomText[0]))
+                    if (! juce::CharacterFunctions::isWhitespace (first.atomText[0]))
                     {
                         lastAtom.atomText += first.atomText;
-                        lastAtom.numChars = (uint16) (lastAtom.numChars + first.numChars);
+                        lastAtom.numChars = (juce::uint16) (lastAtom.numChars + first.numChars);
                         lastAtom.width = font.getStringWidthFloat (lastAtom.getText (passwordChar));
                         ++i;
                     }
@@ -134,13 +134,13 @@ public:
                 TextAtom secondAtom;
                 secondAtom.atomText = atom.atomText.substring (indexToBreakAt - index);
                 secondAtom.width = font.getStringWidthFloat (secondAtom.getText (passwordChar));
-                secondAtom.numChars = (uint16) secondAtom.atomText.length();
+                secondAtom.numChars = (juce::uint16) secondAtom.atomText.length();
 
                 section2->atoms.add (secondAtom);
 
                 atom.atomText = atom.atomText.substring (0, indexToBreakAt - index);
                 atom.width = font.getStringWidthFloat (atom.getText (passwordChar));
-                atom.numChars = (uint16) (indexToBreakAt - index);
+                atom.numChars = (juce::uint16) (indexToBreakAt - index);
 
                 for (int j = i + 1; j < atoms.size(); ++j)
                     section2->atoms.add (atoms.getUnchecked (j));
@@ -155,13 +155,13 @@ public:
         return section2;
     }
 
-    void appendAllText (MemoryOutputStream& mo) const
+    void appendAllText (juce::MemoryOutputStream& mo) const
     {
         for (auto& atom : atoms)
             mo << atom.atomText;
     }
 
-    void appendSubstring (MemoryOutputStream& mo, Range<int> range) const
+    void appendSubstring (juce::MemoryOutputStream& mo, juce::Range<int> range) const
     {
         int index = 0;
 
@@ -194,7 +194,7 @@ public:
         return total;
     }
 
-    void setFont (const Font& newFont, const juce_wchar passwordCharToUse)
+    void setFont (const juce::Font& newFont, const juce::juce_wchar passwordCharToUse)
     {
         if (font != newFont || passwordChar != passwordCharToUse)
         {
@@ -207,13 +207,13 @@ public:
     }
 
     //==============================================================================
-    Font font;
-    Colour colour;
-    Array<TextAtom> atoms;
-    juce_wchar passwordChar;
+    juce::Font font;
+    juce::Colour colour;
+    juce::Array<TextAtom> atoms;
+    juce::juce_wchar passwordChar;
 
 private:
-    void initialiseAtoms (const String& textToParse)
+    void initialiseAtoms (const juce::String& textToParse)
     {
         auto text = textToParse.getCharPointer();
 
@@ -261,9 +261,9 @@ private:
             }
 
             TextAtom atom;
-            atom.atomText = String (start, numChars);
+            atom.atomText = juce::String (start, numChars);
             atom.width = (atom.isNewLine() ? 0.0f : font.getStringWidthFloat (atom.getText (passwordChar)));
-            atom.numChars = (uint16) numChars;
+            atom.numChars = (juce::uint16) numChars;
             atoms.add (atom);
         }
     }
@@ -352,8 +352,8 @@ struct UnicodeTextEditor::Iterator
 
                         right += nextAtom.width;
 
-                        lineHeight2 = jmax (lineHeight2, s->font.getHeight());
-                        maxDescent2 = jmax (maxDescent2, s->font.getDescent());
+                        lineHeight2 = juce::jmax (lineHeight2, s->font.getHeight());
+                        maxDescent2 = juce::jmax (maxDescent2, s->font.getDescent());
 
                         if (shouldWrap (right))
                         {
@@ -393,7 +393,7 @@ struct UnicodeTextEditor::Iterator
             if (atom->isWhitespace())
             {
                 // leave whitespace at the end of a line, but truncate it to avoid scrolling
-                atomRight = jmin (atomRight, wordWrapWidth);
+                atomRight = juce::jmin (atomRight, wordWrapWidth);
             }
             else if (shouldWrap (atom->width))  // atom too big to fit on a line, so break it up..
             {
@@ -445,7 +445,7 @@ struct UnicodeTextEditor::Iterator
                 checkSize = true;
             }
 
-            if (! isPositiveAndBelow (tempAtomIndex, section->atoms.size()))
+            if (! juce::isPositiveAndBelow (tempAtomIndex, section->atoms.size()))
                 break;
 
             auto& nextAtom = section->atoms.getReference (tempAtomIndex);
@@ -456,8 +456,8 @@ struct UnicodeTextEditor::Iterator
 
             if (checkSize)
             {
-                lineHeight = jmax (lineHeight, section->font.getHeight());
-                maxDescent = jmax (maxDescent, section->font.getDescent());
+                lineHeight = juce::jmax (lineHeight, section->font.getHeight());
+                maxDescent = juce::jmax (maxDescent, section->font.getDescent());
             }
 
             ++tempAtomIndex;
@@ -468,14 +468,14 @@ struct UnicodeTextEditor::Iterator
 
     float getJustificationOffsetX (float lineWidth) const
     {
-        if (justification.testFlags (Justification::horizontallyCentred))    return jmax (0.0f, (bottomRight.x - lineWidth) * 0.5f);
-        if (justification.testFlags (Justification::right))                  return jmax (0.0f, bottomRight.x - lineWidth);
+        if (justification.testFlags (juce::Justification::horizontallyCentred))    return juce::jmax (0.0f, (bottomRight.x - lineWidth) * 0.5f);
+        if (justification.testFlags (juce::Justification::right))                  return juce::jmax (0.0f, bottomRight.x - lineWidth);
 
         return 0;
     }
 
     //==============================================================================
-    void draw (Graphics& g, const UniformTextSection*& lastSection, AffineTransform transform) const
+    void draw (juce::Graphics& g, const UniformTextSection*& lastSection, juce::AffineTransform transform) const
     {
         if (atom == nullptr)
             return;
@@ -484,7 +484,7 @@ struct UnicodeTextEditor::Iterator
         {
             jassert (atom->getTrimmedText (passwordCharacter).isNotEmpty());
             
-            AttributedString attributedString;
+            juce::AttributedString attributedString;
             attributedString.append(atom->getTrimmedText(passwordCharacter));
             
             attributedString.setJustification(justification);
@@ -494,26 +494,26 @@ struct UnicodeTextEditor::Iterator
         }
     }
 
-    void drawUnderline (Graphics& g, Range<int> underline, Colour colour, AffineTransform transform) const
+    void drawUnderline (juce::Graphics& g, juce::Range<int> underline, juce::Colour colour, juce::AffineTransform transform) const
     {
-        auto startX    = roundToInt (indexToX (underline.getStart()));
-        auto endX      = roundToInt (indexToX (underline.getEnd()));
-        auto baselineY = roundToInt (lineY + currentSection->font.getAscent() + 0.5f);
+        auto startX    = juce::roundToInt (indexToX (underline.getStart()));
+        auto endX      = juce::roundToInt (indexToX (underline.getEnd()));
+        auto baselineY = juce::roundToInt (lineY + currentSection->font.getAscent() + 0.5f);
 
-        Graphics::ScopedSaveState state (g);
+        juce::Graphics::ScopedSaveState state (g);
         g.addTransform (transform);
         g.reduceClipRegion ({ startX, baselineY, endX - startX, 1 });
-        g.fillCheckerBoard ({ (float) endX, (float) baselineY + 1.0f }, 3.0f, 1.0f, colour, Colours::transparentBlack);
+        g.fillCheckerBoard ({ (float) endX, (float) baselineY + 1.0f }, 3.0f, 1.0f, colour, juce::Colours::transparentBlack);
     }
 
-    void drawSelectedText (Graphics& g, Range<int> selected, Colour selectedTextColour, AffineTransform transform) const
+    void drawSelectedText (juce::Graphics& g, juce::Range<int> selected, juce::Colour selectedTextColour, juce::AffineTransform transform) const
     {
         if (atom == nullptr)
             return;
 
         if (passwordCharacter != 0 || ! atom->isWhitespace())
         {
-            AttributedString attributedString;
+            juce::AttributedString attributedString;
             
             attributedString.setJustification(justification);
             attributedString.append(atom->getTrimmedText(passwordCharacter));
@@ -537,7 +537,7 @@ struct UnicodeTextEditor::Iterator
         if (indexToFind >= indexInText + atom->numChars)
             return atomRight;
 
-        GlyphArrangement g;
+        juce::GlyphArrangement g;
         g.addLineOfText (currentSection->font,
                          atom->getText (passwordCharacter),
                          atomX, 0.0f);
@@ -545,7 +545,7 @@ struct UnicodeTextEditor::Iterator
         if (indexToFind - indexInText >= g.getNumGlyphs())
             return atomRight;
 
-        return jmin (atomRight, g.getGlyph (indexToFind - indexInText).getLeft());
+        return juce::jmin (atomRight, g.getGlyph (indexToFind - indexInText).getLeft());
     }
 
     int xToIndex (float xToFind) const
@@ -556,7 +556,7 @@ struct UnicodeTextEditor::Iterator
         if (xToFind >= atomRight)
             return indexInText + atom->numChars;
 
-        GlyphArrangement g;
+        juce::GlyphArrangement g;
         g.addLineOfText (currentSection->font,
                          atom->getText (passwordCharacter),
                          atomX, 0.0f);
@@ -576,7 +576,7 @@ struct UnicodeTextEditor::Iterator
     }
 
     //==============================================================================
-    bool getCharPosition (int index, Point<float>& anchor, float& lineHeightFound)
+    bool getCharPosition (int index, juce::Point<float>& anchor, float& lineHeightFound)
     {
         while (next())
         {
@@ -595,7 +595,7 @@ struct UnicodeTextEditor::Iterator
 
     float getYOffset()
     {
-        if (justification.testFlags (Justification::top) || lineY >= bottomRight.y)
+        if (justification.testFlags (juce::Justification::top) || lineY >= bottomRight.y)
             return 0;
 
         while (next())
@@ -604,9 +604,9 @@ struct UnicodeTextEditor::Iterator
                 return 0;
         }
 
-        auto bottom = jmax (0.0f, bottomRight.y - lineY - lineHeight);
+        auto bottom = juce::jmax (0.0f, bottomRight.y - lineY - lineHeight);
 
-        if (justification.testFlags (Justification::bottom))
+        if (justification.testFlags (juce::Justification::bottom))
             return bottom;
 
         return bottom * 0.5f;
@@ -621,7 +621,7 @@ struct UnicodeTextEditor::Iterator
         if (atom != nullptr && atom->isNewLine())
             height += lineHeight;
 
-        return roundToInt (height);
+        return juce::roundToInt (height);
     }
 
     int getTextRight()
@@ -629,17 +629,17 @@ struct UnicodeTextEditor::Iterator
         float maxWidth = 0.0f;
 
         while (next())
-            maxWidth = jmax (maxWidth, atomRight);
+            maxWidth = juce::jmax (maxWidth, atomRight);
 
-        return roundToInt (maxWidth);
+        return juce::roundToInt (maxWidth);
     }
 
-    Rectangle<int> getTextBounds (Range<int> range) const
+    juce::Rectangle<int> getTextBounds (juce::Range<int> range) const
     {
         auto startX = indexToX (range.getStart());
         auto endX   = indexToX (range.getEnd());
 
-        return Rectangle<float> (startX, lineY, endX - startX, lineHeight * lineSpacing).getSmallestIntegerContainer();
+        return juce::Rectangle<float> (startX, lineY, endX - startX, lineHeight * lineSpacing).getSmallestIntegerContainer();
     }
 
     //==============================================================================
@@ -649,13 +649,13 @@ struct UnicodeTextEditor::Iterator
     const TextAtom* atom = nullptr;
 
 private:
-    const OwnedArray<UniformTextSection>& sections;
+    const juce::OwnedArray<UniformTextSection>& sections;
     const UniformTextSection* currentSection = nullptr;
     int sectionIndex = 0, atomIndex = 0;
-    Justification justification;
-    const Point<float> bottomRight;
+    juce::Justification justification;
+    const juce::Point<float> bottomRight;
     const float wordWrapWidth;
-    const juce_wchar passwordCharacter;
+    const juce::juce_wchar passwordCharacter;
     const float lineSpacing;
     const bool underlineWhitespace;
     TextAtom longAtom;
@@ -670,7 +670,7 @@ private:
         longAtom.atomText = longAtom.atomText.substring (longAtom.numChars);
         indexInText += longAtom.numChars;
 
-        GlyphArrangement g;
+        juce::GlyphArrangement g;
         g.addLineOfText (currentSection->font, atom->getText (passwordCharacter), 0.0f, 0.0f);
 
         int split;
@@ -678,8 +678,8 @@ private:
             if (shouldWrap (g.getGlyph (split).getRight()))
                 break;
 
-        const auto numChars = jmax (1, split);
-        longAtom.numChars = (uint16) numChars;
+        const auto numChars = juce::jmax (1, split);
+        longAtom.numChars = (juce::uint16) numChars;
         longAtom.width = g.getGlyph (numChars - 1).getRight();
 
         atomX = getJustificationOffsetX (longAtom.width);
@@ -720,10 +720,10 @@ private:
 
 
 //==============================================================================
-struct UnicodeTextEditor::InsertAction  : public UndoableAction
+struct UnicodeTextEditor::InsertAction  : public juce::UndoableAction
 {
-    InsertAction (UnicodeTextEditor& ed, const String& newText, int insertPos,
-                  const Font& newFont, Colour newColour, int oldCaret, int newCaret)
+    InsertAction (UnicodeTextEditor& ed, const juce::String& newText, int insertPos,
+                  const juce::Font& newFont, juce::Colour newColour, int oldCaret, int newCaret)
         : owner (ed),
           text (newText),
           insertIndex (insertPos),
@@ -753,19 +753,19 @@ struct UnicodeTextEditor::InsertAction  : public UndoableAction
 
 private:
     UnicodeTextEditor& owner;
-    const String text;
+    const juce::String text;
     const int insertIndex, oldCaretPos, newCaretPos;
-    const Font font;
-    const Colour colour;
+    const juce::Font font;
+    const juce::Colour colour;
 
     JUCE_DECLARE_NON_COPYABLE (InsertAction)
 };
 
 //==============================================================================
-struct UnicodeTextEditor::RemoveAction  : public UndoableAction
+struct UnicodeTextEditor::RemoveAction  : public juce::UndoableAction
 {
-    RemoveAction (UnicodeTextEditor& ed, Range<int> rangeToRemove, int oldCaret, int newCaret,
-                  const Array<UniformTextSection*>& oldSections)
+    RemoveAction (UnicodeTextEditor& ed, juce::Range<int> rangeToRemove, int oldCaret, int newCaret,
+                  const juce::Array<UniformTextSection*>& oldSections)
         : owner (ed),
           range (rangeToRemove),
           oldCaretPos (oldCaret),
@@ -799,23 +799,23 @@ struct UnicodeTextEditor::RemoveAction  : public UndoableAction
 
 private:
     UnicodeTextEditor& owner;
-    const Range<int> range;
+    const juce::Range<int> range;
     const int oldCaretPos, newCaretPos;
-    OwnedArray<UniformTextSection> removedSections;
+    juce::OwnedArray<UniformTextSection> removedSections;
 
     JUCE_DECLARE_NON_COPYABLE (RemoveAction)
 };
 
 //==============================================================================
-struct UnicodeTextEditor::TextHolderComponent  : public Component,
-                                          public Timer,
-                                          public Value::Listener
+struct UnicodeTextEditor::TextHolderComponent  : public juce::Component,
+public juce::Timer,
+                                          public juce::Value::Listener
 {
     TextHolderComponent (UnicodeTextEditor& ed)  : owner (ed)
     {
         setWantsKeyboardFocus (false);
         setInterceptsMouseClicks (false, true);
-        setMouseCursor (MouseCursor::ParentCursor);
+        setMouseCursor (juce::MouseCursor::ParentCursor);
 
         owner.getTextValue().addListener (this);
     }
@@ -825,7 +825,7 @@ struct UnicodeTextEditor::TextHolderComponent  : public Component,
         owner.getTextValue().removeListener (this);
     }
 
-    void paint (Graphics& g) override
+    void paint (juce::Graphics& g) override
     {
         owner.drawContent (g);
     }
@@ -840,7 +840,7 @@ struct UnicodeTextEditor::TextHolderComponent  : public Component,
         owner.timerCallbackInt();
     }
 
-    void valueChanged (Value&) override
+    void valueChanged (juce::Value&) override
     {
         owner.textWasChangedByValue();
     }
@@ -848,7 +848,7 @@ struct UnicodeTextEditor::TextHolderComponent  : public Component,
     UnicodeTextEditor& owner;
 
 private:
-    std::unique_ptr<AccessibilityHandler> createAccessibilityHandler() override
+    std::unique_ptr<juce::AccessibilityHandler> createAccessibilityHandler() override
     {
         return createIgnoredAccessibilityHandler (*this);
     }
@@ -857,11 +857,11 @@ private:
 };
 
 //==============================================================================
-struct UnicodeTextEditor::TextEditorViewport  : public Viewport
+struct UnicodeTextEditor::TextEditorViewport  : public juce::Viewport
 {
     TextEditorViewport (UnicodeTextEditor& ed) : owner (ed) {}
 
-    void visibleAreaChanged (const Rectangle<int>&) override
+    void visibleAreaChanged (const juce::Rectangle<int>&) override
     {
         if (! reentrant) // it's rare, but possible to get into a feedback loop as the viewport's scrollbars
                          // appear and disappear, causing the wrap width to change.
@@ -872,14 +872,14 @@ struct UnicodeTextEditor::TextEditorViewport  : public Viewport
             {
                 lastWordWrapWidth = wordWrapWidth;
 
-                ScopedValueSetter<bool> svs (reentrant, true);
+                juce::ScopedValueSetter<bool> svs (reentrant, true);
                 owner.checkLayout();
             }
         }
     }
 
 private:
-    std::unique_ptr<AccessibilityHandler> createAccessibilityHandler() override
+    std::unique_ptr<juce::AccessibilityHandler> createAccessibilityHandler() override
     {
         return createIgnoredAccessibilityHandler (*this);
     }
@@ -901,19 +901,19 @@ namespace TextEditorDefs
 
     const int maxActionsPerTransaction = 100;
 
-    static int getCharacterCategory (juce_wchar character) noexcept
+    static int getCharacterCategory (juce::juce_wchar character) noexcept
     {
-        return CharacterFunctions::isLetterOrDigit (character)
-                    ? 2 : (CharacterFunctions::isWhitespace (character) ? 0 : 1);
+        return juce::CharacterFunctions::isLetterOrDigit (character)
+                    ? 2 : (juce::CharacterFunctions::isWhitespace (character) ? 0 : 1);
     }
 }
 
 //==============================================================================
-UnicodeTextEditor::UnicodeTextEditor (const String& name, juce_wchar passwordChar)
+UnicodeTextEditor::UnicodeTextEditor (const juce::String& name, juce::juce_wchar passwordChar)
     : Component (name),
       passwordCharacter (passwordChar)
 {
-    setMouseCursor (MouseCursor::IBeamCursor);
+    setMouseCursor (juce::MouseCursor::IBeamCursor);
 
     viewport.reset (new TextEditorViewport (*this));
     addAndMakeVisible (viewport.get());
@@ -932,7 +932,7 @@ UnicodeTextEditor::~UnicodeTextEditor()
     juce::Desktop::getInstance().removeGlobalMouseListener (this);
 
     textValue.removeListener (textHolder);
-    textValue.referTo (Value());
+    textValue.referTo (juce::Value());
 
     viewport.reset();
     textHolder = nullptr;
@@ -941,7 +941,7 @@ UnicodeTextEditor::~UnicodeTextEditor()
 //==============================================================================
 void UnicodeTextEditor::newTransaction()
 {
-    lastTransactionTime = Time::getApproximateMillisecondCounter();
+    lastTransactionTime = juce::Time::getApproximateMillisecondCounter();
     undoManager.beginNewTransaction();
 }
 
@@ -1048,7 +1048,7 @@ void UnicodeTextEditor::setSelectAllWhenFocused (bool b)
     selectAllTextWhenFocused = b;
 }
 
-void UnicodeTextEditor::setJustification (Justification j)
+void UnicodeTextEditor::setJustification (juce::Justification j)
 {
     if (justification != j)
     {
@@ -1060,13 +1060,13 @@ void UnicodeTextEditor::setJustification (Justification j)
 }
 
 //==============================================================================
-void UnicodeTextEditor::setFont (const Font& newFont)
+void UnicodeTextEditor::setFont (const juce::Font& newFont)
 {
     currentFont = newFont;
     scrollToMakeSureCursorIsVisible();
 }
 
-void UnicodeTextEditor::applyFontToAllText (const Font& newFont, bool changeCurrentFont)
+void UnicodeTextEditor::applyFontToAllText (const juce::Font& newFont, bool changeCurrentFont)
 {
     if (changeCurrentFont)
         currentFont = newFont;
@@ -1085,13 +1085,13 @@ void UnicodeTextEditor::applyFontToAllText (const Font& newFont, bool changeCurr
     repaint();
 }
 
-void UnicodeTextEditor::applyColourToAllText (const Colour& newColour, bool changeCurrentTextColour)
+void UnicodeTextEditor::applyColourToAllText (const juce::Colour& newColour, bool changeCurrentTextColour)
 {
     for (auto* uts : sections)
         uts->colour = newColour;
 
     if (changeCurrentTextColour)
-        setColour (TextEditor::textColourId, newColour);
+        setColour (juce::TextEditor::textColourId, newColour);
     else
         repaint();
 }
@@ -1147,21 +1147,21 @@ void UnicodeTextEditor::updateCaretPosition()
     {
         Iterator i (*this);
         caret->setCaretPosition (getCaretRectangle().translated (leftIndent,
-                                                                 topIndent + roundToInt (i.getYOffset())) - getTextOffset());
+                                                                 topIndent + juce::roundToInt (i.getYOffset())) - getTextOffset());
 
         if (auto* handler = getAccessibilityHandler())
-            handler->notifyAccessibilityEvent (AccessibilityEvent::textSelectionChanged);
+            handler->notifyAccessibilityEvent (juce::AccessibilityEvent::textSelectionChanged);
     }
 }
 
-UnicodeTextEditor::LengthAndCharacterRestriction::LengthAndCharacterRestriction (int maxLen, const String& chars)
+UnicodeTextEditor::LengthAndCharacterRestriction::LengthAndCharacterRestriction (int maxLen, const juce::String& chars)
     : allowedCharacters (chars), maxLength (maxLen)
 {
 }
 
-String UnicodeTextEditor::LengthAndCharacterRestriction::filterNewText (UnicodeTextEditor& ed, const String& newInput)
+juce::String UnicodeTextEditor::LengthAndCharacterRestriction::filterNewText (UnicodeTextEditor& ed, const juce::String& newInput)
 {
-    String t (newInput);
+    juce::String t (newInput);
 
     if (allowedCharacters.isNotEmpty())
         t = t.retainCharacters (allowedCharacters);
@@ -1177,18 +1177,18 @@ void UnicodeTextEditor::setInputFilter (InputFilter* newFilter, bool takeOwnersh
     inputFilter.set (newFilter, takeOwnership);
 }
 
-void UnicodeTextEditor::setInputRestrictions (int maxLen, const String& chars)
+void UnicodeTextEditor::setInputRestrictions (int maxLen, const juce::String& chars)
 {
     setInputFilter (new LengthAndCharacterRestriction (maxLen, chars), true);
 }
 
-void UnicodeTextEditor::setTextToShowWhenEmpty (const String& text, Colour colourToUse)
+void UnicodeTextEditor::setTextToShowWhenEmpty (const juce::String& text, juce::Colour colourToUse)
 {
     textToShowWhenEmpty = text;
     colourForTextWhenEmpty = colourToUse;
 }
 
-void UnicodeTextEditor::setPasswordCharacter (juce_wchar newPasswordCharacter)
+void UnicodeTextEditor::setPasswordCharacter (juce::juce_wchar newPasswordCharacter)
 {
     if (passwordCharacter != newPasswordCharacter)
     {
@@ -1211,7 +1211,7 @@ void UnicodeTextEditor::clear()
     repaint();
 }
 
-void UnicodeTextEditor::setText (const String& newText, bool sendTextChangeMessage)
+void UnicodeTextEditor::setText (const juce::String& newText, bool sendTextChangeMessage)
 {
     auto newLength = newText.length();
 
@@ -1260,7 +1260,7 @@ void UnicodeTextEditor::updateValueFromText()
     }
 }
 
-Value& UnicodeTextEditor::getTextValue()
+juce::Value& UnicodeTextEditor::getTextValue()
 {
     updateValueFromText();
     return textValue;
@@ -1287,17 +1287,17 @@ void UnicodeTextEditor::textChanged()
     }
 
     if (auto* handler = getAccessibilityHandler())
-        handler->notifyAccessibilityEvent (AccessibilityEvent::textChanged);
+        handler->notifyAccessibilityEvent (juce::AccessibilityEvent::textChanged);
 }
 
-void UnicodeTextEditor::setSelection (Range<int> newSelection) noexcept
+void UnicodeTextEditor::setSelection (juce::Range<int> newSelection) noexcept
 {
     if (newSelection != selection)
     {
         selection = newSelection;
 
         if (auto* handler = getAccessibilityHandler())
-            handler->notifyAccessibilityEvent (AccessibilityEvent::textSelectionChanged);
+            handler->notifyAccessibilityEvent (juce::AccessibilityEvent::textSelectionChanged);
     }
 }
 
@@ -1312,7 +1312,7 @@ void UnicodeTextEditor::timerCallbackInt()
 {
     checkFocus();
 
-    auto now = Time::getApproximateMillisecondCounter();
+    auto now = juce::Time::getApproximateMillisecondCounter();
 
     if (now > lastTransactionTime + 200)
         newTransaction();
@@ -1324,7 +1324,7 @@ void UnicodeTextEditor::checkFocus()
         wasFocused = true;
 }
 
-void UnicodeTextEditor::repaintText (Range<int> range)
+void UnicodeTextEditor::repaintText (juce::Range<int> range)
 {
     if (! range.isEmpty())
     {
@@ -1336,7 +1336,7 @@ void UnicodeTextEditor::repaintText (Range<int> range)
 
         Iterator i (*this);
 
-        Point<float> anchor;
+        juce::Point<float> anchor;
         auto lh = currentFont.getHeight();
         i.getCharPosition (range.getStart(), anchor, lh);
 
@@ -1354,7 +1354,7 @@ void UnicodeTextEditor::repaintText (Range<int> range)
         }
 
         auto offset = i.getYOffset();
-        textHolder->repaint (0, roundToInt (y1 + offset), textHolder->getWidth(), roundToInt ((float) y2 - y1 + offset));
+        textHolder->repaint (0, juce::roundToInt (y1 + offset), textHolder->getWidth(), juce::roundToInt ((float) y2 - y1 + offset));
     }
 }
 
@@ -1364,7 +1364,7 @@ void UnicodeTextEditor::moveCaret (int newCaretPos)
     if (newCaretPos < 0)
         newCaretPos = 0;
     else
-        newCaretPos = jmin (newCaretPos, getTotalNumChars());
+        newCaretPos = juce::jmin (newCaretPos, getTotalNumChars());
 
     if (newCaretPos != getCaretPosition())
     {
@@ -1377,7 +1377,7 @@ void UnicodeTextEditor::moveCaret (int newCaretPos)
         updateCaretPosition();
 
         if (auto* handler = getAccessibilityHandler())
-            handler->notifyAccessibilityEvent (AccessibilityEvent::textChanged);
+            handler->notifyAccessibilityEvent (juce::AccessibilityEvent::textChanged);
     }
 }
 
@@ -1406,12 +1406,12 @@ void UnicodeTextEditor::scrollEditorToPositionCaret (const int desiredCaretX,
     auto vx = caretRect.getX() - desiredCaretX;
     auto vy = caretRect.getY() - desiredCaretY;
 
-    if (desiredCaretX < jmax (1, proportionOfWidth (0.05f)))
+    if (desiredCaretX < juce::jmax (1, proportionOfWidth (0.05f)))
         vx += desiredCaretX - proportionOfWidth (0.2f);
-    else if (desiredCaretX > jmax (0, viewport->getMaximumVisibleWidth() - (wordWrap ? 2 : 10)))
+    else if (desiredCaretX > juce::jmax (0, viewport->getMaximumVisibleWidth() - (wordWrap ? 2 : 10)))
         vx += desiredCaretX + (isMultiLine() ? proportionOfWidth (0.2f) : 10) - viewport->getMaximumVisibleWidth();
 
-    vx = jlimit (0, jmax (0, textHolder->getWidth() + 8 - viewport->getMaximumVisibleWidth()), vx);
+    vx = juce::jlimit (0, juce::jmax (0, textHolder->getWidth() + 8 - viewport->getMaximumVisibleWidth()), vx);
 
     if (! isMultiLine())
     {
@@ -1419,38 +1419,38 @@ void UnicodeTextEditor::scrollEditorToPositionCaret (const int desiredCaretX,
     }
     else
     {
-        vy = jlimit (0, jmax (0, textHolder->getHeight() - viewport->getMaximumVisibleHeight()), vy);
+        vy = juce::jlimit (0, juce::jmax (0, textHolder->getHeight() - viewport->getMaximumVisibleHeight()), vy);
 
         if (desiredCaretY < 0)
-            vy = jmax (0, desiredCaretY + vy);
-        else if (desiredCaretY > jmax (0, viewport->getMaximumVisibleHeight() - caretRect.getHeight()))
+            vy = juce::jmax (0, desiredCaretY + vy);
+        else if (desiredCaretY > juce::jmax (0, viewport->getMaximumVisibleHeight() - caretRect.getHeight()))
             vy += desiredCaretY + 2 + caretRect.getHeight() - viewport->getMaximumVisibleHeight();
     }
 
     viewport->setViewPosition (vx, vy);
 }
 
-Rectangle<int> UnicodeTextEditor::getCaretRectangleForCharIndex (int index) const
+juce::Rectangle<int> UnicodeTextEditor::getCaretRectangleForCharIndex (int index) const
 {
-    Point<float> anchor;
+    juce::Point<float> anchor;
     auto cursorHeight = currentFont.getHeight(); // (in case the text is empty and the call below doesn't set this value)
     getCharPosition (index, anchor, cursorHeight);
 
-    return Rectangle<float> { anchor.x, anchor.y, 2.0f, cursorHeight }.getSmallestIntegerContainer() + getTextOffset();
+    return juce::Rectangle<float> { anchor.x, anchor.y, 2.0f, cursorHeight }.getSmallestIntegerContainer() + getTextOffset();
 }
 
-Point<int> UnicodeTextEditor::getTextOffset() const noexcept
+juce::Point<int> UnicodeTextEditor::getTextOffset() const noexcept
 {
     Iterator i (*this);
     auto yOffset = i.getYOffset();
 
     return { getLeftIndent() + borderSize.getLeft() - viewport->getViewPositionX(),
-             roundToInt ((float) getTopIndent() + (float) borderSize.getTop() + yOffset) - viewport->getViewPositionY() };
+        juce::roundToInt ((float) getTopIndent() + (float) borderSize.getTop() + yOffset) - viewport->getViewPositionY() };
 }
 
-RectangleList<int> UnicodeTextEditor::getTextBounds (Range<int> textRange) const
+juce::RectangleList<int> UnicodeTextEditor::getTextBounds (juce::Range<int> textRange) const
 {
-    RectangleList<int> boundingBox;
+    juce::RectangleList<int> boundingBox;
     Iterator i (*this);
 
     while (i.next())
@@ -1478,12 +1478,12 @@ int UnicodeTextEditor::getWordWrapWidth() const
 
 int UnicodeTextEditor::getMaximumTextWidth() const
 {
-    return jmax (1, viewport->getMaximumVisibleWidth() - leftIndent - rightEdgeSpace);
+    return juce::jmax (1, viewport->getMaximumVisibleWidth() - leftIndent - rightEdgeSpace);
 }
 
 int UnicodeTextEditor::getMaximumTextHeight() const
 {
-    return jmax (1, viewport->getMaximumVisibleHeight() - topIndent);
+    return juce::jmax (1, viewport->getMaximumVisibleHeight() - topIndent);
 }
 
 void UnicodeTextEditor::checkLayout()
@@ -1491,7 +1491,7 @@ void UnicodeTextEditor::checkLayout()
     if (getWordWrapWidth() > 0)
     {
         const auto textBottom = Iterator (*this).getTotalTextHeight() + topIndent;
-        const auto textRight = jmax (viewport->getMaximumVisibleWidth(),
+        const auto textRight = juce::jmax (viewport->getMaximumVisibleWidth(),
                                      Iterator (*this).getTextRight() + leftIndent + rightEdgeSpace);
 
         textHolder->setSize (textRight, textBottom);
@@ -1515,13 +1515,13 @@ void UnicodeTextEditor::setIndents (int newLeftIndent, int newTopIndent)
     }
 }
 
-void UnicodeTextEditor::setBorder (BorderSize<int> border)
+void UnicodeTextEditor::setBorder (juce::BorderSize<int> border)
 {
     borderSize = border;
     resized();
 }
 
-BorderSize<int> UnicodeTextEditor::getBorder() const
+juce::BorderSize<int> UnicodeTextEditor::getBorder() const
 {
     return borderSize;
 }
@@ -1541,16 +1541,16 @@ void UnicodeTextEditor::scrollToMakeSureCursorIsVisible()
         auto caretRect = getCaretRectangle().translated (leftIndent, topIndent) - getTextOffset();
         auto relativeCursor = caretRect.getPosition() - viewPos;
 
-        if (relativeCursor.x < jmax (1, proportionOfWidth (0.05f)))
+        if (relativeCursor.x < juce::jmax (1, proportionOfWidth (0.05f)))
         {
             viewPos.x += relativeCursor.x - proportionOfWidth (0.2f);
         }
-        else if (relativeCursor.x > jmax (0, viewport->getMaximumVisibleWidth() - (wordWrap ? 2 : 10)))
+        else if (relativeCursor.x > juce::jmax (0, viewport->getMaximumVisibleWidth() - (wordWrap ? 2 : 10)))
         {
             viewPos.x += relativeCursor.x + (isMultiLine() ? proportionOfWidth (0.2f) : 10) - viewport->getMaximumVisibleWidth();
         }
 
-        viewPos.x = jlimit (0, jmax (0, textHolder->getWidth() + 8 - viewport->getMaximumVisibleWidth()), viewPos.x);
+        viewPos.x = juce::jlimit (0, juce::jmax (0, textHolder->getWidth() + 8 - viewport->getMaximumVisibleWidth()), viewPos.x);
 
         if (! isMultiLine())
         {
@@ -1558,9 +1558,9 @@ void UnicodeTextEditor::scrollToMakeSureCursorIsVisible()
         }
         else if (relativeCursor.y < 0)
         {
-            viewPos.y = jmax (0, relativeCursor.y + viewPos.y);
+            viewPos.y = juce::jmax (0, relativeCursor.y + viewPos.y);
         }
-        else if (relativeCursor.y > jmax (0, viewport->getMaximumVisibleHeight() - caretRect.getHeight()))
+        else if (relativeCursor.y > juce::jmax (0, viewport->getMaximumVisibleHeight() - caretRect.getHeight()))
         {
             viewPos.y += relativeCursor.y + 2 + caretRect.getHeight() - viewport->getMaximumVisibleHeight();
         }
@@ -1590,14 +1590,14 @@ void UnicodeTextEditor::moveCaretTo (const int newPosition, const bool isSelecti
             if (getCaretPosition() >= selection.getEnd())
                 dragType = draggingSelectionEnd;
 
-            setSelection (Range<int>::between (getCaretPosition(), selection.getEnd()));
+            setSelection (juce::Range<int>::between (getCaretPosition(), selection.getEnd()));
         }
         else
         {
             if (getCaretPosition() < selection.getStart())
                 dragType = draggingSelectionStart;
 
-            setSelection (Range<int>::between (getCaretPosition(), selection.getStart()));
+            setSelection (juce::Range<int>::between (getCaretPosition(), selection.getStart()));
         }
 
         repaintText (selection.getUnionWith (oldSelection));
@@ -1609,7 +1609,7 @@ void UnicodeTextEditor::moveCaretTo (const int newPosition, const bool isSelecti
         repaintText (selection);
 
         moveCaret (newPosition);
-        setSelection (Range<int>::emptyRange (getCaretPosition()));
+        setSelection (juce::Range<int>::emptyRange (getCaretPosition()));
     }
 }
 
@@ -1621,19 +1621,19 @@ int UnicodeTextEditor::getTextIndexAt (const int x, const int y) const
                             (float) (y - offset.y));
 }
 
-int UnicodeTextEditor::getTextIndexAt (const Point<int> pt) const
+int UnicodeTextEditor::getTextIndexAt (const juce::Point<int> pt) const
 {
     return getTextIndexAt (pt.x, pt.y);
 }
 
-int UnicodeTextEditor::getCharIndexForPoint (const Point<int> point) const
+int UnicodeTextEditor::getCharIndexForPoint (const juce::Point<int> point) const
 {
     return getTextIndexAt (isMultiLine() ? point : getTextBounds ({ 0, getTotalNumChars() }).getBounds().getConstrainedPoint (point));
 }
 
-void UnicodeTextEditor::insertTextAtCaret (const String& t)
+void UnicodeTextEditor::insertTextAtCaret (const juce::String& t)
 {
-    String newText (inputFilter != nullptr ? inputFilter->filterNewText (*this, t) : t);
+    juce::String newText (inputFilter != nullptr ? inputFilter->filterNewText (*this, t) : t);
 
     if (isMultiLine())
         newText = newText.replace ("\r\n", "\n");
@@ -1652,7 +1652,7 @@ void UnicodeTextEditor::insertTextAtCaret (const String& t)
     textChanged();
 }
 
-void UnicodeTextEditor::setHighlightedRegion (const Range<int>& newSelection)
+void UnicodeTextEditor::setHighlightedRegion (const juce::Range<int>& newSelection)
 {
     if (newSelection == getHighlightedRegion())
         return;
@@ -1671,7 +1671,7 @@ void UnicodeTextEditor::copy()
         auto selectedText = getHighlightedText();
 
         if (selectedText.isNotEmpty())
-            SystemClipboard::copyTextToClipboard (selectedText);
+            juce::SystemClipboard::copyTextToClipboard (selectedText);
     }
 }
 
@@ -1679,7 +1679,7 @@ void UnicodeTextEditor::paste()
 {
     if (! isReadOnly())
     {
-        auto clip = SystemClipboard::getTextFromClipboard();
+        auto clip = juce::SystemClipboard::getTextFromClipboard();
 
         if (clip.isNotEmpty())
             insertTextAtCaret (clip);
@@ -1691,12 +1691,12 @@ void UnicodeTextEditor::cut()
     if (! isReadOnly())
     {
         moveCaret (selection.getEnd());
-        insertTextAtCaret (String());
+        insertTextAtCaret (juce::String());
     }
 }
 
 //==============================================================================
-void UnicodeTextEditor::drawContent (Graphics& g)
+void UnicodeTextEditor::drawContent (juce::Graphics& g)
 {
     if (getWordWrapWidth() > 0)
     {
@@ -1705,16 +1705,16 @@ void UnicodeTextEditor::drawContent (Graphics& g)
 
         auto yOffset = Iterator (*this).getYOffset();
 
-        AffineTransform transform;
+        juce::AffineTransform transform;
 
         if (yOffset > 0)
         {
-            transform = AffineTransform::translation (0.0f, yOffset);
-            clip.setY (roundToInt ((float) clip.getY() - yOffset));
+            transform = juce::AffineTransform::translation (0.0f, yOffset);
+            clip.setY (juce::roundToInt ((float) clip.getY() - yOffset));
         }
 
         Iterator i (*this);
-        Colour selectedTextColour;
+        juce::Colour selectedTextColour;
 
         if (! selection.isEmpty())
         {
@@ -1762,12 +1762,12 @@ void UnicodeTextEditor::drawContent (Graphics& g)
     }
 }
 
-void UnicodeTextEditor::paint (Graphics& g)
+void UnicodeTextEditor::paint (juce::Graphics& g)
 {
     fillTextEditorBackground (g, getWidth(), getHeight());
 }
 
-void UnicodeTextEditor::paintOverChildren (Graphics& g)
+void UnicodeTextEditor::paintOverChildren (juce::Graphics& g)
 {
     if (textToShowWhenEmpty.isNotEmpty()
          && (! hasKeyboardFocus (false))
@@ -1776,7 +1776,7 @@ void UnicodeTextEditor::paintOverChildren (Graphics& g)
         g.setColour (colourForTextWhenEmpty);
         g.setFont (getFont());
 
-        Rectangle<int> textBounds (leftIndent,
+        juce::Rectangle<int> textBounds (leftIndent,
                                    topIndent,
                                    viewport->getWidth() - leftIndent,
                                    getHeight() - topIndent);
@@ -1789,26 +1789,26 @@ void UnicodeTextEditor::paintOverChildren (Graphics& g)
 }
 
 //==============================================================================
-void UnicodeTextEditor::addPopupMenuItems (PopupMenu& m, const MouseEvent*)
+void UnicodeTextEditor::addPopupMenuItems (juce::PopupMenu& m, const juce::MouseEvent*)
 {
     const bool writable = ! isReadOnly();
 
     if (passwordCharacter == 0)
     {
-        m.addItem (StandardApplicationCommandIDs::cut,   TRANS("Cut"), writable);
-        m.addItem (StandardApplicationCommandIDs::copy,  TRANS("Copy"), ! selection.isEmpty());
+        m.addItem (juce::StandardApplicationCommandIDs::cut,   TRANS("Cut"), writable);
+        m.addItem (juce::StandardApplicationCommandIDs::copy,  TRANS("Copy"), ! selection.isEmpty());
     }
 
-    m.addItem (StandardApplicationCommandIDs::paste,     TRANS("Paste"), writable);
-    m.addItem (StandardApplicationCommandIDs::del,       TRANS("Delete"), writable);
+    m.addItem (juce::StandardApplicationCommandIDs::paste,     TRANS("Paste"), writable);
+    m.addItem (juce::StandardApplicationCommandIDs::del,       TRANS("Delete"), writable);
     m.addSeparator();
-    m.addItem (StandardApplicationCommandIDs::selectAll, TRANS("Select All"));
+    m.addItem (juce::StandardApplicationCommandIDs::selectAll, TRANS("Select All"));
     m.addSeparator();
 
     if (getUndoManager() != nullptr)
     {
-        m.addItem (StandardApplicationCommandIDs::undo, TRANS("Undo"), undoManager.canUndo());
-        m.addItem (StandardApplicationCommandIDs::redo, TRANS("Redo"), undoManager.canRedo());
+        m.addItem (juce::StandardApplicationCommandIDs::undo, TRANS("Undo"), undoManager.canUndo());
+        m.addItem (juce::StandardApplicationCommandIDs::redo, TRANS("Redo"), undoManager.canRedo());
     }
 }
 
@@ -1816,19 +1816,19 @@ void UnicodeTextEditor::performPopupMenuAction (const int menuItemID)
 {
     switch (menuItemID)
     {
-        case StandardApplicationCommandIDs::cut:        cutToClipboard(); break;
-        case StandardApplicationCommandIDs::copy:       copyToClipboard(); break;
-        case StandardApplicationCommandIDs::paste:      pasteFromClipboard(); break;
-        case StandardApplicationCommandIDs::del:        cut(); break;
-        case StandardApplicationCommandIDs::selectAll:  selectAll(); break;
-        case StandardApplicationCommandIDs::undo:       undo(); break;
-        case StandardApplicationCommandIDs::redo:       redo(); break;
+        case juce::StandardApplicationCommandIDs::cut:        cutToClipboard(); break;
+        case juce::StandardApplicationCommandIDs::copy:       copyToClipboard(); break;
+        case juce::StandardApplicationCommandIDs::paste:      pasteFromClipboard(); break;
+        case juce::StandardApplicationCommandIDs::del:        cut(); break;
+        case juce::StandardApplicationCommandIDs::selectAll:  selectAll(); break;
+        case juce::StandardApplicationCommandIDs::undo:       undo(); break;
+        case juce::StandardApplicationCommandIDs::redo:       redo(); break;
         default: break;
     }
 }
 
 //==============================================================================
-void UnicodeTextEditor::mouseDown (const MouseEvent& e)
+void UnicodeTextEditor::mouseDown (const juce::MouseEvent& e)
 {
     mouseDownInEditor = e.originalComponent == this;
 
@@ -1849,13 +1849,13 @@ void UnicodeTextEditor::mouseDown (const MouseEvent& e)
         }
         else
         {
-            PopupMenu m;
+            juce::PopupMenu m;
             m.setLookAndFeel (&getLookAndFeel());
             addPopupMenuItems (m, &e);
 
             menuActive = true;
 
-            m.showMenuAsync (PopupMenu::Options(),
+            m.showMenuAsync (juce::PopupMenu::Options(),
                              [safeThis = SafePointer<UnicodeTextEditor> { this }] (int menuResult)
                              {
                                  if (auto* editor = safeThis.getComponent())
@@ -1870,7 +1870,7 @@ void UnicodeTextEditor::mouseDown (const MouseEvent& e)
     }
 }
 
-void UnicodeTextEditor::mouseDrag (const MouseEvent& e)
+void UnicodeTextEditor::mouseDrag (const juce::MouseEvent& e)
 {
     if (! mouseDownInEditor)
         return;
@@ -1880,7 +1880,7 @@ void UnicodeTextEditor::mouseDrag (const MouseEvent& e)
             moveCaretTo (getTextIndexAt (e.getPosition()), true);
 }
 
-void UnicodeTextEditor::mouseUp (const MouseEvent& e)
+void UnicodeTextEditor::mouseUp (const juce::MouseEvent& e)
 {
     if (! mouseDownInEditor)
         return;
@@ -1895,7 +1895,7 @@ void UnicodeTextEditor::mouseUp (const MouseEvent& e)
     wasFocused = true;
 }
 
-void UnicodeTextEditor::mouseDoubleClick (const MouseEvent& e)
+void UnicodeTextEditor::mouseDoubleClick (const juce::MouseEvent& e)
 {
     if (! mouseDownInEditor)
         return;
@@ -1917,7 +1917,7 @@ void UnicodeTextEditor::mouseDoubleClick (const MouseEvent& e)
             auto c = t[tokenEnd];
 
             // (note the slight bodge here - it's because iswalnum only checks for alphabetic chars in the current locale)
-            if (CharacterFunctions::isLetterOrDigit (c) || c > 128)
+            if (juce::CharacterFunctions::isLetterOrDigit (c) || c > 128)
                 ++tokenEnd;
             else
                 break;
@@ -1930,7 +1930,7 @@ void UnicodeTextEditor::mouseDoubleClick (const MouseEvent& e)
             auto c = t[tokenStart - 1];
 
             // (note the slight bodge here - it's because iswalnum only checks for alphabetic chars in the current locale)
-            if (CharacterFunctions::isLetterOrDigit (c) || c > 128)
+            if (juce::CharacterFunctions::isLetterOrDigit (c) || c > 128)
                 --tokenStart;
             else
                 break;
@@ -1964,7 +1964,7 @@ void UnicodeTextEditor::mouseDoubleClick (const MouseEvent& e)
     moveCaretTo (tokenStart, true);
 }
 
-void UnicodeTextEditor::mouseWheelMove (const MouseEvent& e, const MouseWheelDetails& wheel)
+void UnicodeTextEditor::mouseWheelMove (const juce::MouseEvent& e, const juce::MouseWheelDetails& wheel)
 {
     if (! mouseDownInEditor)
         return;
@@ -2140,15 +2140,15 @@ void UnicodeTextEditor::setEscapeAndReturnKeysConsumed (bool shouldBeConsumed) n
     consumeEscAndReturnKeys = shouldBeConsumed;
 }
 
-bool UnicodeTextEditor::keyPressed (const KeyPress& key)
+bool UnicodeTextEditor::keyPressed (const juce::KeyPress& key)
 {
-    if (isReadOnly() && key != KeyPress ('c', ModifierKeys::commandModifier, 0)
-                     && key != KeyPress ('a', ModifierKeys::commandModifier, 0))
+    if (isReadOnly() && key != juce::KeyPress ('c', juce::ModifierKeys::commandModifier, 0)
+                     && key != juce::KeyPress ('a', juce::ModifierKeys::commandModifier, 0))
         return false;
 
-    if (! TextEditorKeyMapper<UnicodeTextEditor>::invokeKeyFunction (*this, key))
+    if (! juce::TextEditorKeyMapper<UnicodeTextEditor>::invokeKeyFunction (*this, key))
     {
-        if (key == KeyPress::returnKey)
+        if (key == juce::KeyPress::returnKey)
         {
             newTransaction();
 
@@ -2162,7 +2162,7 @@ bool UnicodeTextEditor::keyPressed (const KeyPress& key)
                 return consumeEscAndReturnKeys;
             }
         }
-        else if (key.isKeyCode (KeyPress::escapeKey))
+        else if (key.isKeyCode (juce::KeyPress::escapeKey))
         {
             newTransaction();
             moveCaretTo (getCaretPosition(), false);
@@ -2172,9 +2172,9 @@ bool UnicodeTextEditor::keyPressed (const KeyPress& key)
         else if (key.getTextCharacter() >= ' '
                   || (tabKeyUsed && (key.getTextCharacter() == '\t')))
         {
-            insertTextAtCaret (String::charToString (key.getTextCharacter()));
+            insertTextAtCaret (juce::String::charToString (key.getTextCharacter()));
 
-            lastTransactionTime = Time::getApproximateMillisecondCounter();
+            lastTransactionTime = juce::Time::getApproximateMillisecondCounter();
         }
         else
         {
@@ -2196,12 +2196,12 @@ bool UnicodeTextEditor::keyStateChanged (const bool isKeyDown)
    #endif
 
     if ((! consumeEscAndReturnKeys)
-         && (KeyPress (KeyPress::escapeKey).isCurrentlyDown()
-          || KeyPress (KeyPress::returnKey).isCurrentlyDown()))
+         && (juce::KeyPress (juce::KeyPress::escapeKey).isCurrentlyDown()
+          || juce::KeyPress (juce::KeyPress::returnKey).isCurrentlyDown()))
         return false;
 
     // (overridden to avoid forwarding key events to the parent)
-    return ! ModifierKeys::currentModifiers.isCommandDown();
+    return ! juce::ModifierKeys::currentModifiers.isCommandDown();
 }
 
 //==============================================================================
@@ -2243,7 +2243,7 @@ void UnicodeTextEditor::focusLost (FocusChangeType)
 void UnicodeTextEditor::resized()
 {
     viewport->setBoundsInset (borderSize);
-    viewport->setSingleStepSizes (16, roundToInt (currentFont.getHeight()));
+    viewport->setSingleStepSizes (16, juce::roundToInt (currentFont.getHeight()));
 
     checkLayout();
 
@@ -2298,25 +2298,25 @@ void UnicodeTextEditor::handleCommandMessage (const int commandId)
     }
 }
 
-void UnicodeTextEditor::setTemporaryUnderlining (const Array<Range<int>>& newUnderlinedSections)
+void UnicodeTextEditor::setTemporaryUnderlining (const juce::Array<juce::Range<int>>& newUnderlinedSections)
 {
     underlinedSections = newUnderlinedSections;
     repaint();
 }
 
 //==============================================================================
-UndoManager* UnicodeTextEditor::getUndoManager() noexcept
+juce::UndoManager* UnicodeTextEditor::getUndoManager() noexcept
 {
     return readOnly ? nullptr : &undoManager;
 }
 
-void UnicodeTextEditor::clearInternal (UndoManager* const um)
+void UnicodeTextEditor::clearInternal (juce::UndoManager* const um)
 {
     remove ({ 0, getTotalNumChars() }, um, caretPosition);
 }
 
-void UnicodeTextEditor::insert (const String& text, int insertIndex, const Font& font,
-                         Colour colour, UndoManager* um, int caretPositionToMoveTo)
+void UnicodeTextEditor::insert (const juce::String& text, int insertIndex, const juce::Font& font,
+                                juce::Colour colour, juce::UndoManager* um, int caretPositionToMoveTo)
 {
     if (text.isNotEmpty())
     {
@@ -2371,7 +2371,7 @@ void UnicodeTextEditor::insert (const String& text, int insertIndex, const Font&
     }
 }
 
-void UnicodeTextEditor::reinsert (int insertIndex, const OwnedArray<UniformTextSection>& sectionsToInsert)
+void UnicodeTextEditor::reinsert (int insertIndex, const juce::OwnedArray<UniformTextSection>& sectionsToInsert)
 {
     int index = 0;
     int nextIndex = 0;
@@ -2410,7 +2410,7 @@ void UnicodeTextEditor::reinsert (int insertIndex, const OwnedArray<UniformTextS
     valueTextNeedsUpdating = true;
 }
 
-void UnicodeTextEditor::remove (Range<int> range, UndoManager* const um, const int caretPositionToMoveTo)
+void UnicodeTextEditor::remove (juce::Range<int> range, juce::UndoManager* const um, const int caretPositionToMoveTo)
 {
     if (! range.isEmpty())
     {
@@ -2443,7 +2443,7 @@ void UnicodeTextEditor::remove (Range<int> range, UndoManager* const um, const i
 
         if (um != nullptr)
         {
-            Array<UniformTextSection*> removedSections;
+            juce::Array<UniformTextSection*> removedSections;
 
             for (auto* section : sections)
             {
@@ -2502,9 +2502,9 @@ void UnicodeTextEditor::remove (Range<int> range, UndoManager* const um, const i
 }
 
 //==============================================================================
-String UnicodeTextEditor::getText() const
+juce::String UnicodeTextEditor::getText() const
 {
-    MemoryOutputStream mo;
+    juce::MemoryOutputStream mo;
     mo.preallocate ((size_t) getTotalNumChars());
 
     for (auto* s : sections)
@@ -2513,13 +2513,13 @@ String UnicodeTextEditor::getText() const
     return mo.toUTF8();
 }
 
-String UnicodeTextEditor::getTextInRange (const Range<int>& range) const
+juce::String UnicodeTextEditor::getTextInRange (const juce::Range<int>& range) const
 {
     if (range.isEmpty())
         return {};
 
-    MemoryOutputStream mo;
-    mo.preallocate ((size_t) jmin (getTotalNumChars(), range.getLength()));
+    juce::MemoryOutputStream mo;
+    mo.preallocate ((size_t) juce::jmin (getTotalNumChars(), range.getLength()));
 
     int index = 0;
 
@@ -2541,7 +2541,7 @@ String UnicodeTextEditor::getTextInRange (const Range<int>& range) const
     return mo.toUTF8();
 }
 
-String UnicodeTextEditor::getHighlightedText() const
+juce::String UnicodeTextEditor::getHighlightedText() const
 {
     return getTextInRange (selection);
 }
@@ -2564,7 +2564,7 @@ bool UnicodeTextEditor::isEmpty() const
     return getTotalNumChars() == 0;
 }
 
-void UnicodeTextEditor::getCharPosition (int index, Point<float>& anchor, float& lineHeight) const
+void UnicodeTextEditor::getCharPosition (int index, juce::Point<float>& anchor, float& lineHeight) const
 {
     if (getWordWrapWidth() <= 0)
     {
@@ -2596,7 +2596,7 @@ int UnicodeTextEditor::indexAtPosition (const float x, const float y) const
             if (y < i.lineY + i.lineHeight)
             {
                 if (y < i.lineY)
-                    return jmax (0, i.indexInText - 1);
+                    return juce::jmax (0, i.indexInText - 1);
 
                 if (x <= i.atomX || i.atom->isNewLine())
                     return i.indexInText;
@@ -2617,7 +2617,7 @@ int UnicodeTextEditor::findWordBreakAfter (const int position) const
     auto totalLength = t.length();
     int i = 0;
 
-    while (i < totalLength && CharacterFunctions::isWhitespace (t[i]))
+    while (i < totalLength && juce::CharacterFunctions::isWhitespace (t[i]))
         ++i;
 
     auto type = TextEditorDefs::getCharacterCategory (t[i]);
@@ -2625,7 +2625,7 @@ int UnicodeTextEditor::findWordBreakAfter (const int position) const
     while (i < totalLength && type == TextEditorDefs::getCharacterCategory (t[i]))
         ++i;
 
-    while (i < totalLength && CharacterFunctions::isWhitespace (t[i]))
+    while (i < totalLength && juce::CharacterFunctions::isWhitespace (t[i]))
         ++i;
 
     return position + i;
@@ -2636,12 +2636,12 @@ int UnicodeTextEditor::findWordBreakBefore (const int position) const
     if (position <= 0)
         return 0;
 
-    auto startOfBuffer = jmax (0, position - 512);
+    auto startOfBuffer = juce::jmax (0, position - 512);
     auto t = getTextInRange ({ startOfBuffer, position });
 
     int i = position - startOfBuffer;
 
-    while (i > 0 && CharacterFunctions::isWhitespace (t [i - 1]))
+    while (i > 0 && juce::CharacterFunctions::isWhitespace (t [i - 1]))
         --i;
 
     if (i > 0)
@@ -2684,22 +2684,22 @@ void UnicodeTextEditor::coalesceSimilarSections()
 }
 
 //==============================================================================
-class UnicodeTextEditor::EditorAccessibilityHandler  : public AccessibilityHandler
+class UnicodeTextEditor::EditorAccessibilityHandler  : public juce::AccessibilityHandler
 {
 public:
     explicit EditorAccessibilityHandler (UnicodeTextEditor& textEditorToWrap)
         : AccessibilityHandler (textEditorToWrap,
-                                textEditorToWrap.isReadOnly() ? AccessibilityRole::staticText : AccessibilityRole::editableText,
+                                textEditorToWrap.isReadOnly() ? juce::AccessibilityRole::staticText : juce::AccessibilityRole::editableText,
                                 {},
                                 { std::make_unique<TextEditorTextInterface> (textEditorToWrap) }),
           unicodeTextEditor (textEditorToWrap)
     {
     }
 
-    String getHelp() const override  { return unicodeTextEditor.getTooltip(); }
+    juce::String getHelp() const override  { return unicodeTextEditor.getTooltip(); }
 
 private:
-    class TextEditorTextInterface  : public AccessibilityTextInterface
+    class TextEditorTextInterface  : public juce::AccessibilityTextInterface
     {
     public:
         explicit TextEditorTextInterface (UnicodeTextEditor& editor)
@@ -2711,41 +2711,41 @@ private:
         bool isReadOnly() const override                     { return unicodeTextEditor.isReadOnly(); }
 
         int getTotalNumCharacters() const override           { return unicodeTextEditor.getText().length(); }
-        Range<int> getSelection() const override             { return unicodeTextEditor.getHighlightedRegion(); }
+        juce::Range<int> getSelection() const override             { return unicodeTextEditor.getHighlightedRegion(); }
 
-        void setSelection (Range<int> r) override
+        void setSelection (juce::Range<int> r) override
         {
             unicodeTextEditor.setHighlightedRegion (r);
         }
 
-        String getText (Range<int> r) const override
+        juce::String getText (juce::Range<int> r) const override
         {
             if (isDisplayingProtectedText())
-                return String::repeatedString (String::charToString (unicodeTextEditor.getPasswordCharacter()),
+                return juce::String::repeatedString (juce::String::charToString (unicodeTextEditor.getPasswordCharacter()),
                                                getTotalNumCharacters());
 
             return unicodeTextEditor.getTextInRange (r);
         }
 
-        void setText (const String& newText) override
+        void setText (const juce::String& newText) override
         {
             unicodeTextEditor.setText (newText);
         }
 
         int getTextInsertionOffset() const override          { return unicodeTextEditor.getCaretPosition(); }
 
-        RectangleList<int> getTextBounds (Range<int> textRange) const override
+        juce::RectangleList<int> getTextBounds (juce::Range<int> textRange) const override
         {
             auto localRects = unicodeTextEditor.getTextBounds (textRange);
-            RectangleList<int> globalRects;
+            juce::RectangleList<int> globalRects;
 
             std::for_each (localRects.begin(), localRects.end(),
-                           [&] (const Rectangle<int>& r) { globalRects.add ( unicodeTextEditor.localAreaToGlobal (r)); });
+                           [&] (const juce::Rectangle<int>& r) { globalRects.add ( unicodeTextEditor.localAreaToGlobal (r)); });
 
             return globalRects;
         }
 
-        int getOffsetAtPoint (Point<int> point) const override
+        int getOffsetAtPoint (juce::Point<int> point) const override
         {
             return unicodeTextEditor.getTextIndexAt (unicodeTextEditor.getLocalPoint (nullptr, point));
         }
@@ -2763,39 +2763,39 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EditorAccessibilityHandler)
 };
 
-std::unique_ptr<AccessibilityHandler> UnicodeTextEditor::createAccessibilityHandler()
+std::unique_ptr<juce::AccessibilityHandler> UnicodeTextEditor::createAccessibilityHandler()
 {
     return std::make_unique<EditorAccessibilityHandler> (*this);
 }
 
 // LookAndFeel-ish functions: you can override these for custom drawing behaviour
-void UnicodeTextEditor::fillTextEditorBackground (Graphics& g, int width, int height)
+void UnicodeTextEditor::fillTextEditorBackground (juce::Graphics& g, int width, int height)
 {
-    g.setColour (findColour (TextEditor::backgroundColourId));
+    g.setColour (findColour (juce::TextEditor::backgroundColourId));
     g.fillRect (0, 0, width, height);
 
-    g.setColour (findColour (TextEditor::outlineColourId));
+    g.setColour (findColour (juce::TextEditor::outlineColourId));
     g.drawHorizontalLine (height - 1, 0.0f, static_cast<float> (width));
 }
 
-void UnicodeTextEditor::drawTextEditorOutline (Graphics& g, int width, int height)
+void UnicodeTextEditor::drawTextEditorOutline (juce::Graphics& g, int width, int height)
 {
     if (isEnabled())
     {
         if (hasKeyboardFocus (true) && ! isReadOnly())
         {
-            g.setColour (findColour (TextEditor::focusedOutlineColourId));
+            g.setColour (findColour (juce::TextEditor::focusedOutlineColourId));
             g.drawRect (0, 0, width, height, 2);
         }
         else
         {
-            g.setColour (findColour (TextEditor::outlineColourId));
+            g.setColour (findColour (juce::TextEditor::outlineColourId));
             g.drawRect (0, 0, width, height);
         }
     }
 }
 
-CaretComponent* UnicodeTextEditor::createCaretComponent (Component* keyFocusOwner)
+juce::CaretComponent* UnicodeTextEditor::createCaretComponent (juce::Component* keyFocusOwner)
 {
-    return new CaretComponent (keyFocusOwner);
+    return new juce::CaretComponent (keyFocusOwner);
 }
