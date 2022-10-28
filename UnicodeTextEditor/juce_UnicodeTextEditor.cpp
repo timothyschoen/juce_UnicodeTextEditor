@@ -25,6 +25,87 @@
 
 #include "UnicodeTextEditor.h"
 
+//==============================================================================
+class UnicodeTextEditorAccessibilityHandler  : public AccessibilityHandler
+{
+public:
+    explicit UnicodeTextEditorAccessibilityHandler (UnicodeTextEditor& textEditorToWrap)
+        : AccessibilityHandler (textEditorToWrap,
+                                textEditorToWrap.isReadOnly() ? AccessibilityRole::staticText : AccessibilityRole::editableText,
+                                {},
+                                { std::make_unique<UnicodeTextEditorTextInterface> (textEditorToWrap) }),
+          UnicodeTextEditor (textEditorToWrap)
+    {
+    }
+
+    String getHelp() const override  { return UnicodeTextEditor.getTooltip(); }
+
+private:
+    class UnicodeTextEditorTextInterface  : public AccessibilityTextInterface
+    {
+    public:
+        explicit UnicodeTextEditorTextInterface (UnicodeTextEditor& editor)
+            : UnicodeTextEditor (editor)
+        {
+        }
+
+        bool isDisplayingProtectedText() const override      { return UnicodeTextEditor.getPasswordCharacter() != 0; }
+        bool isReadOnly() const override                     { return UnicodeTextEditor.isReadOnly(); }
+
+        int getTotalNumCharacters() const override           { return UnicodeTextEditor.getText().length(); }
+        Range<int> getSelection() const override             { return UnicodeTextEditor.getHighlightedRegion(); }
+
+        void setSelection (Range<int> r) override
+        {
+            UnicodeTextEditor.setHighlightedRegion (r);
+        }
+
+        String getText (Range<int> r) const override
+        {
+            if (isDisplayingProtectedText())
+                return String::repeatedString (String::charToString (UnicodeTextEditor.getPasswordCharacter()),
+                                               getTotalNumCharacters());
+
+            return UnicodeTextEditor.getTextInRange (r);
+        }
+
+        void setText (const String& newText) override
+        {
+            UnicodeTextEditor.setText (newText);
+        }
+
+        int getTextInsertionOffset() const override          { return UnicodeTextEditor.getCaretPosition(); }
+
+        RectangleList<int> getTextBounds (Range<int> textRange) const override
+        {
+            auto localRects = UnicodeTextEditor.getTextBounds (textRange);
+            RectangleList<int> globalRects;
+
+            std::for_each (localRects.begin(), localRects.end(),
+                           [&] (const Rectangle<int>& r) { globalRects.add (UnicodeTextEditor.localAreaToGlobal (r)); });
+
+            return globalRects;
+        }
+
+        int getOffsetAtPoint (Point<int> point) const override
+        {
+            return UnicodeTextEditor.getTextIndexAt (UnicodeTextEditor.getLocalPoint (nullptr, point));
+        }
+
+    private:
+        UnicodeTextEditor& UnicodeTextEditor;
+
+        //==============================================================================
+        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (UnicodeTextEditorTextInterface)
+    };
+
+    UnicodeTextEditor& UnicodeTextEditor;
+
+    //==============================================================================
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (UnicodeTextEditorAccessibilityHandler)
+};
+
+
 // a word or space that can't be broken down any further
 struct TextAtom
 {
@@ -2683,88 +2764,10 @@ void UnicodeTextEditor::coalesceSimilarSections()
     }
 }
 
-//==============================================================================
-class UnicodeTextEditorAccessibilityHandler  : public AccessibilityHandler
-{
-public:
-    explicit UnicodeTextEditorAccessibilityHandler (UnicodeTextEditor& textEditorToWrap)
-        : AccessibilityHandler (textEditorToWrap,
-                                textEditorToWrap.isReadOnly() ? AccessibilityRole::staticText : AccessibilityRole::editableText,
-                                {},
-                                { std::make_unique<UnicodeTextEditorTextInterface> (textEditorToWrap) }),
-          UnicodeTextEditor (textEditorToWrap)
-    {
-    }
-
-    String getHelp() const override  { return UnicodeTextEditor.getTooltip(); }
-
-private:
-    class UnicodeTextEditorTextInterface  : public AccessibilityTextInterface
-    {
-    public:
-        explicit UnicodeTextEditorTextInterface (UnicodeTextEditor& editor)
-            : UnicodeTextEditor (editor)
-        {
-        }
-
-        bool isDisplayingProtectedText() const override      { return UnicodeTextEditor.getPasswordCharacter() != 0; }
-        bool isReadOnly() const override                     { return UnicodeTextEditor.isReadOnly(); }
-
-        int getTotalNumCharacters() const override           { return UnicodeTextEditor.getText().length(); }
-        Range<int> getSelection() const override             { return UnicodeTextEditor.getHighlightedRegion(); }
-
-        void setSelection (Range<int> r) override
-        {
-            UnicodeTextEditor.setHighlightedRegion (r);
-        }
-
-        String getText (Range<int> r) const override
-        {
-            if (isDisplayingProtectedText())
-                return String::repeatedString (String::charToString (UnicodeTextEditor.getPasswordCharacter()),
-                                               getTotalNumCharacters());
-
-            return UnicodeTextEditor.getTextInRange (r);
-        }
-
-        void setText (const String& newText) override
-        {
-            UnicodeTextEditor.setText (newText);
-        }
-
-        int getTextInsertionOffset() const override          { return UnicodeTextEditor.getCaretPosition(); }
-
-        RectangleList<int> getTextBounds (Range<int> textRange) const override
-        {
-            auto localRects = UnicodeTextEditor.getTextBounds (textRange);
-            RectangleList<int> globalRects;
-
-            std::for_each (localRects.begin(), localRects.end(),
-                           [&] (const Rectangle<int>& r) { globalRects.add (UnicodeTextEditor.localAreaToGlobal (r)); });
-
-            return globalRects;
-        }
-
-        int getOffsetAtPoint (Point<int> point) const override
-        {
-            return UnicodeTextEditor.getTextIndexAt (UnicodeTextEditor.getLocalPoint (nullptr, point));
-        }
-
-    private:
-        UnicodeTextEditor& UnicodeTextEditor;
-
-        //==============================================================================
-        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (UnicodeTextEditorTextInterface)
-    };
-
-    UnicodeTextEditor& UnicodeTextEditor;
-
-    //==============================================================================
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (UnicodeTextEditorAccessibilityHandler)
-};
 
 std::unique_ptr<AccessibilityHandler> UnicodeTextEditor::createAccessibilityHandler()
 {
+    
     return std::make_unique<UnicodeTextEditorAccessibilityHandler> (*this);
 }
 
