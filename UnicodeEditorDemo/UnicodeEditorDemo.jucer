@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="CqturS" name="UnicodeEditorDemo" projectType="guiapp" useAppConfig="0"
-              addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1">
+              addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" displaySplashScreen="1">
   <MAINGROUP id="ZbK7OH" name="UnicodeEditorDemo">
     <GROUP id="{DB996705-EA83-B92D-5E18-C9A6C5B164B0}" name="Source">
       <FILE id="lPqO7b" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
@@ -18,14 +18,42 @@
         <CONFIGURATION isDebug="0" name="Release" targetName="UnicodeEditorDemo"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
-        <MODULEPATH id="juce_core" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_data_structures" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_events" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_graphics" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_core" path="../../PlugData/Libraries/JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="../../PlugData/Libraries/JUCE/modules"/>
+        <MODULEPATH id="juce_graphics" path="../../PlugData/Libraries/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../../PlugData/Libraries/JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../../PlugData/Libraries/JUCE/modules"/>
         <MODULEPATH id="UnicodeTextEditor" path="../../juce_UnicodeTextEditor"/>
-        <MODULEPATH id="juce_gui_basics" path="../../../JUCE/modules"/>
       </MODULEPATHS>
     </XCODE_MAC>
+    <LINUX_MAKE targetFolder="Builds/LinuxMakefile">
+      <CONFIGURATIONS>
+        <CONFIGURATION isDebug="1" name="Debug"/>
+        <CONFIGURATION isDebug="0" name="Release"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_core" path="../../PlugData/Libraries/JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="../../PlugData/Libraries/JUCE/modules"/>
+        <MODULEPATH id="juce_graphics" path="../../PlugData/Libraries/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../../PlugData/Libraries/JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../../PlugData/Libraries/JUCE/modules"/>
+        <MODULEPATH id="UnicodeTextEditor" path="../../juce_UnicodeTextEditor"/>
+      </MODULEPATHS>
+    </LINUX_MAKE>
+    <VS2022 targetFolder="Builds/VisualStudio2022">
+      <CONFIGURATIONS>
+        <CONFIGURATION isDebug="1" name="Debug"/>
+        <CONFIGURATION isDebug="0" name="Release"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_core" path="../../PlugData/Libraries/JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="../../PlugData/Libraries/JUCE/modules"/>
+        <MODULEPATH id="juce_graphics" path="../../PlugData/Libraries/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../../PlugData/Libraries/JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../../PlugData/Libraries/JUCE/modules"/>
+        <MODULEPATH id="UnicodeTextEditor" path="../../juce_UnicodeTextEditor"/>
+      </MODULEPATHS>
+    </VS2022>
   </EXPORTFORMATS>
   <MODULES>
     <MODULE id="juce_core" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>

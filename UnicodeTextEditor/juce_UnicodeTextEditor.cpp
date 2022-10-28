@@ -2699,7 +2699,7 @@ public:
     String getHelp() const override  { return UnicodeTextEditor.getTooltip(); }
 
 private:
-    class TextEditorTextInterface  : public AccessibilityTextInterface
+    class UnicodeTextEditorTextInterface  : public AccessibilityTextInterface
     {
     public:
         explicit TextEditorTextInterface (UnicodeTextEditor& editor)
