@@ -1,5 +1,5 @@
 # juce_UnicodeTextEditor
-A unicode text editor module for JUCE. Based on the original JUCE text editor, except it draws the text with an AttributedString and TextLayout. So far, it has behaved the same as the regular JUCE TextEditor for me, except that non-latin characters will render correctly.
+A unicode text editor module for JUCE. Based on the original JUCE text editor, except it draws the text with an AttributedString. So far, it has behaved the same as the regular JUCE TextEditor for me, except that non-latin characters will render correctly.
 
 Please let me know if you experience any problems!
 
