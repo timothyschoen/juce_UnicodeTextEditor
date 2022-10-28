@@ -490,7 +490,11 @@ struct UnicodeTextEditor::Iterator
             attributedString.setJustification(justification);
             attributedString.setColour(currentSection->colour);
             attributedString.setFont(currentSection->font);
+            
+            g.saveState();
+            g.addTransform(transform);
             attributedString.draw(g, {atomX, lineY, atom->width, lineHeight});
+            g.restoreState();
         }
     }
 
@@ -524,7 +528,10 @@ struct UnicodeTextEditor::Iterator
                 attributedString.setColour(selected, selectedTextColour);
             }
             
+            g.saveState();
+            g.addTransform(transform);
             attributedString.draw(g, {atomX, lineY, atom->width, lineHeight});
+            g.restoreState();
         }
     }
 
